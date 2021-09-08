@@ -5,7 +5,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM iParam);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR IpszCmdLine, int nCmdShow)
 {
-	HWND hwnd;
+	HWND hwnd;    
 	MSG msg;
 	WNDCLASS WndClass;
 	WndClass.style = CS_HREDRAW || CS_VREDRAW;
