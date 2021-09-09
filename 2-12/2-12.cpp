@@ -21,7 +21,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR IpszCmdLi
 	RegisterClass(&WndClass);
 	hwnd = CreateWindow(_T("Window Class Name"),
 		_T("Window Title Name"),
-		WS_OVERLAPPEDWINDOW,   
+		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
@@ -42,34 +42,40 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR IpszCmdLi
 	return (int)msg.wParam;
 }
 
-LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
-{
-	HDC hdc;
-	PAINTSTRUCT ps;
-	static TCHAR str[1000];
-	static int count, yPos;
-	RECT rt = { 0,0,1000,1000 };
-	switch (iMsg)
-	{
-	case WM_CREATE:
-		count = 0;
-		yPos = 0;
-		break;
-	case WM_PAINT:
-		hdc = BeginPaint(hwnd, &ps);
-		DrawText(hdc, str, _tcslen(str), &rt, DT_TOP | DT_LEFT);
-		EndPaint(hwnd, &ps);
-		break;
-	case WM_CHAR:
-		if(wParam == VK_BACK && count > 0) count--;
-		else str[count++] = wParam;
-		str[count] = NULL;
-		InvalidateRgn(hwnd, NULL, TRUE);
-		break;
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		break;
-	}
-	return(DefWindowProc(hwnd, iMsg, wParam, lParam));
 
-}
+	LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
+	{
+		HDC hdc;
+		PAINTSTRUCT ps;
+		static TCHAR str[100];
+		static int count;
+		static SIZE size;
+
+		RECT rt = { 0,0,1000,1000 };
+		switch (iMsg)
+		{
+		case WM_CREATE:
+			CreateCaret(hwnd, NULL, 5, 15);
+			ShowCaret(hwnd);
+			count = 0;
+			break;
+		case WM_PAINT:
+			hdc = BeginPaint(hwnd, &ps);
+			GetTextExtentPoint(hdc, str, _tcslen(str), &size);
+			TextOut(hdc, 0, 0, str, _tcslen(str));
+			SetCaretPos(size.cx, 0);
+			EndPaint(hwnd, &ps);  
+			break;
+		case WM_CHAR:
+			if (wParam == VK_BACK && count > 0) count--;
+			else str[count++] = wParam;
+			str[count] = NULL;
+			InvalidateRgn(hwnd, NULL, TRUE);
+			break;
+		case WM_DESTROY:
+			HideCaret(hwnd);
+			DestroyCaret();
+			PostQuitMessage(0);
+			break;
+		}
+	}
